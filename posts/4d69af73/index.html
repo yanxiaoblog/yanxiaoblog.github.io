@@ -1,0 +1,318 @@
+<!DOCTYPE html><html class="theme-next gemini use-motion" lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><script src="/lib/pace/pace.min.js?v=1.0.2"></script><link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css"><link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.3"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.3"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.3"><link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222"><meta name="keywords" content="hello"><link rel="alternate" href="/atom.xml" title="言笑" type="application/atom+xml"><meta name="description" content="mybatis缓存的实现与原理简介 什么是缓存？存在内存中的临时数据就是缓存（cache） 为什么使用缓存？减少和数据库交互的次数，减少系统的开销，提高系统的效率 什么数据适合使用缓存？经常被访问的并且不经常改变的数据适合使用缓存"><meta property="og:type" content="article"><meta property="og:title" content="mybatis缓存"><meta property="og:url" content="https://yanxiaoblog.github.io/posts/4d69af73/index.html"><meta property="og:site_name" content="言笑"><meta property="og:description" content="mybatis缓存的实现与原理简介 什么是缓存？存在内存中的临时数据就是缓存（cache） 为什么使用缓存？减少和数据库交互的次数，减少系统的开销，提高系统的效率 什么数据适合使用缓存？经常被访问的并且不经常改变的数据适合使用缓存"><meta property="og:locale"><meta property="og:image" content="https://yanxiaoblog.github.io/posts/4d69af73/mybatis-%E7%BC%93%E5%AD%98%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86.jpg"><meta property="article:published_time" content="2021-09-29T14:47:28.000Z"><meta property="article:modified_time" content="2022-03-02T13:04:47.313Z"><meta property="article:author" content="言笑"><meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://yanxiaoblog.github.io/posts/4d69af73/mybatis-%E7%BC%93%E5%AD%98%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86.jpg"><script type="text/javascript" id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"",scheme:"Gemini",version:"5.1.3",sidebar:{position:"left",display:"post",offset:12,b2t:!1,scrollpercent:!0,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"",apiKey:"",indexName:"",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="https://yanxiaoblog.github.io/posts/4d69af73/"><title>mybatis缓存 | 言笑</title><meta name="generator" content="Hexo 5.4.0"></head><a target="_blank" rel="noopener" href="https://1815972815.github.io/" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513;color:#fff;position:absolute;top:0;border:0;right:0" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,
+80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin:130px 106px" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 
+C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 
+200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 
+156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">言笑</span> <span class="logo-line-after"><i></i></span></a></div><p class="site-subtitle">等到苦尽甘来时，我再和你讲讲我来时的路</p></div><div class="site-nav-toggle"><button><span class="btn-bar"></span> <span class="btn-bar"></span> <span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i><br>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i><br>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li><li class="menu-item menu-item-search"><a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i><br>搜索</a></li></ul><div class="site-search"><div class="popup search-popup local-search-popup"><div class="local-search-header clearfix"><span class="search-icon"><i class="fa fa-search"></i> </span><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span><div class="local-search-input-wrapper"><input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input"></div></div><div id="local-search-result"></div></div></div></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="https://yanxiaoblog.github.io/posts/4d69af73/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content=""><meta itemprop="description" content=""><meta itemprop="image" content="/images/headImg.jpg"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="言笑"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">mybatis缓存</h1><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-09-29T22:47:28+08:00">2021-09-29 </time></span><span id="/posts/4d69af73/" class="leancloud_visitors" data-flag-title="mybatis缓存"><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-eye"></i> </span><span class="post-meta-item-text">阅读次数&#58;</span> <span class="leancloud-visitors-count"></span></span><div class="post-wordcount"><span class="post-meta-item-icon"><i class="fa fa-file-word-o"></i> </span><span class="post-meta-item-text">字数统计&#58;</span> <span title="字数统计">2.1k </span><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-clock-o"></i> </span><span class="post-meta-item-text">阅读时长 &asymp;</span> <span title="阅读时长">8</span></div></div></header><div class="post-body" itemprop="articleBody"><h2 id="mybatis缓存的实现与原理"><a href="#mybatis缓存的实现与原理" class="headerlink" title="mybatis缓存的实现与原理"></a>mybatis缓存的实现与原理</h2><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><ol><li>什么是缓存？<br>存在内存中的临时数据就是缓存（cache）</li><li>为什么使用缓存？<br>减少和数据库交互的次数，减少系统的开销，提高系统的效率</li><li>什么数据适合使用缓存？<br>经常被访问的并且不经常改变的数据适合使用缓存<span id="more"></span><h4 id="mybatis中的缓存"><a href="#mybatis中的缓存" class="headerlink" title="mybatis中的缓存"></a>mybatis中的缓存</h4>mybatis系统默认定义了两个缓存，包括一级缓存和二级缓存</li><li>默认系统开启一级缓存，即sqlSession级别的缓存</li><li>二级缓存需要手动开启，是namespace级别的缓存</li></ol><h4 id="一级缓存"><a href="#一级缓存" class="headerlink" title="一级缓存"></a>一级缓存</h4><ol><li>一级缓存也叫本地缓存，在同一次会话中与mysql交互查询到的结果会被缓存到一级缓存中，如果在同一次会话中<br>查找相同的内容时，就不会到数据库中查找了，会直接从缓存中查找，然后返回结果，这样能减少与数据库交互的<br>次数，提高查询的效率。</li><li>一级缓存失效的情况：<ol><li>没有在同一个sqlSession中，即没有在同一个会话中，会导致一级缓存失败，因为每个sqlSession的<br>一级缓存是独立的</li><li>在同一个sqlSession中，但是查询的语句不同，也会导致一级缓存失败，因为一级缓存就是一个map，key<br>不同，找到的数据才会相同</li><li>在同一个sqlSession中，并且查询语句相同，但是如果在两次相同的查询中执行了增删改操作，一级<br>缓存也会失败，因为数据库中的数据被修改了，如果缓存不失效，那么缓存中的数据就会和数据库中的数据<br>不一致，导致数据的不安全</li><li>手动清除一级缓存后，一级缓存也会失效</li></ol></li></ol><h4 id="二级缓存"><a href="#二级缓存" class="headerlink" title="二级缓存"></a>二级缓存</h4><ol><li>二级缓存也叫全局缓存，因为一级缓存的作用域太低，当关闭会话后，一级缓存中的数据也就被清除了，<br>但是第二个会话可能要使用到这个结果，如果和数据库交互的话，效率太低，所以诞生了二级缓存</li><li>二级缓存的作用域地一个名称空间下，即作用域为namespace</li><li>开启了二级缓存后，在关闭一级缓存后回将一级缓存中的数据保存到二级缓存中，这样其他会话查找同<br>样的结果时就能直接从二级缓存中取到了</li><li>二级缓存的使用步骤：<ol><li>在mybatis-config.xml中的settings标签中开启二级缓存：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;setting name=&quot;cacheEnabled&quot; value=&quot;true&quot;/&gt;</span><br></pre></td></tr></table></figure></li><li>在对应的mapper.xml中配置使用二级缓存,官方文档示例<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;-- 创建一个FIFO缓存，每6秒刷新一次，缓存最多可以存对象或列表的512个引用，将缓存中的数据设置为只读 --&gt;</span><br><span class="line">&lt;cache eviction=&quot;FIFO&quot; flushInterval=&quot;6000&quot; size=&quot;512&quot; readOnly=&quot;true&quot;/&gt;</span><br><span class="line">&lt;-- 一般开启缓存什么都不设置，即 &lt;cache/&gt; 即可 --&gt;</span><br></pre></td></tr></table></figure></li><li>在同一个mapper中，如果将数据存到二级缓存中，不同的sqlSession都可以拿到数据</li></ol></li></ol><h4 id="缓存的执行原理图"><a href="#缓存的执行原理图" class="headerlink" title="缓存的执行原理图"></a>缓存的执行原理图</h4><p><img src="/posts/4d69af73/mybatis-%E7%BC%93%E5%AD%98%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86.jpg"></p><p>开启了二级缓存的情况下，并且是对同一个mapper下，二级缓存才起作用</p><h4 id="使用第三方缓存——ehcache"><a href="#使用第三方缓存——ehcache" class="headerlink" title="使用第三方缓存——ehcache"></a>使用第三方缓存——ehcache</h4><p>使用第三方缓存功能更加强大，对于EhCache可以到百度百科搜索相关信息,一下是EhCache的使用流程：</p><ol><li>在module中的pom.xml移入相关依赖<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-ehcache --&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.mybatis&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;mybatis-ehcache&lt;/artifactId&gt;</span><br><span class="line">            &lt;version&gt;1.0.0&lt;/version&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br></pre></td></tr></table></figure></li><li>在mapper.xml中使用ehcache缓存<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;cache type=&quot;org.mybatis.caches.ehcache.EhcacheCache&quot;/&gt;</span><br></pre></td></tr></table></figure></li><li>在resource资源包中创建ehcache.xml配置文件，并进行配置<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;ehcache xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">         xsi:noNamespaceSchemaLocation=&quot;http://ehcache.org/ehcache.xsd&quot;</span><br><span class="line">         updateCheck=&quot;false&quot;&gt;</span><br><span class="line">&lt;!--</span><br><span class="line">   diskStore：为缓存路径，ehcache分为内存和磁盘两级，此属性定义磁盘的缓存位置。参数解释如下：</span><br><span class="line">   user.home – 用户主目录</span><br><span class="line">   user.dir – 用户当前工作目录</span><br><span class="line">   java.io.tmpdir – 默认临时文件路径</span><br><span class="line"> --&gt;</span><br><span class="line">&lt;diskStore path=&quot;./tmpdir/Tmp_EhCache&quot;/&gt;</span><br><span class="line"></span><br><span class="line">&lt;defaultCache</span><br><span class="line">        eternal=&quot;false&quot;</span><br><span class="line">        maxElementsInMemory=&quot;10000&quot;</span><br><span class="line">        overflowToDisk=&quot;false&quot;</span><br><span class="line">        diskPersistent=&quot;false&quot;</span><br><span class="line">        timeToIdleSeconds=&quot;1800&quot;</span><br><span class="line">        timeToLiveSeconds=&quot;259200&quot;</span><br><span class="line">        memoryStoreEvictionPolicy=&quot;LRU&quot;/&gt;</span><br><span class="line"></span><br><span class="line">&lt;cache</span><br><span class="line">        name=&quot;cloud_user&quot;</span><br><span class="line">        eternal=&quot;false&quot;</span><br><span class="line">        maxElementsInMemory=&quot;5000&quot;</span><br><span class="line">        overflowToDisk=&quot;false&quot;</span><br><span class="line">        diskPersistent=&quot;false&quot;</span><br><span class="line">        timeToIdleSeconds=&quot;1800&quot;</span><br><span class="line">        timeToLiveSeconds=&quot;1800&quot;</span><br><span class="line">        memoryStoreEvictionPolicy=&quot;LRU&quot;/&gt;</span><br><span class="line">&lt;!--</span><br><span class="line">   defaultCache：默认缓存策略，当ehcache找不到定义的缓存时，则使用这个缓存策略。只能定义一个。</span><br><span class="line"> --&gt;</span><br><span class="line">&lt;!--</span><br><span class="line">  name:缓存名称。</span><br><span class="line">  maxElementsInMemory:缓存最大数目</span><br><span class="line">  maxElementsOnDisk：硬盘最大缓存个数。</span><br><span class="line">  eternal:对象是否永久有效，一但设置了，timeout将不起作用。</span><br><span class="line">  overflowToDisk:是否保存到磁盘，当系统当机时</span><br><span class="line">  timeToIdleSeconds:设置对象在失效前的允许闲置时间（单位：秒）。仅当eternal=false对象不是永久有效时使用，可选属性，默认值是0，也就是可闲置时间无穷大。</span><br><span class="line">  timeToLiveSeconds:设置对象在失效前允许存活时间（单位：秒）。最大时间介于创建时间和失效时间之间。仅当eternal=false对象不是永久有效时使用，默认是0.，也就是对象存活时间无穷大。</span><br><span class="line">  diskPersistent：是否缓存虚拟机重启期数据 Whether the disk store persists between restarts of the Virtual Machine. The default value is false.</span><br><span class="line">  diskSpoolBufferSizeMB：这个参数设置DiskStore（磁盘缓存）的缓存区大小。默认是30MB。每个Cache都应该有自己的一个缓冲区。</span><br><span class="line">  diskExpiryThreadIntervalSeconds：磁盘失效线程运行时间间隔，默认是120秒。</span><br><span class="line">  memoryStoreEvictionPolicy：当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存。默认策略是LRU（最近最少使用）。你可以设置为FIFO（先进先出）或是LFU（较少使用）。</span><br><span class="line">  clearOnFlush：内存数量最大时是否清除。</span><br><span class="line">  memoryStoreEvictionPolicy:可选策略有：LRU（最近最少使用，默认策略）、FIFO（先进先出）、LFU（最少访问次数）。</span><br><span class="line">  FIFO，first in first out，这个是大家最熟的，先进先出。</span><br><span class="line">  LFU， Less Frequently Used，就是上面例子中使用的策略，直白一点就是讲一直以来最少被使用的。如上面所讲，缓存的元素有一个hit属性，hit值最小的将会被清出缓存。</span><br><span class="line">  LRU，Least Recently Used，最近最少使用的，缓存的元素有一个时间戳，当缓存容量满了，而又需要腾出地方来缓存新的元素的时候，那么现有缓存元素中时间戳离当前时间最远的元素将被清出缓存。</span><br><span class="line">--&gt;</span><br><span class="line"></span><br><span class="line">&lt;/ehcache&gt;</span><br></pre></td></tr></table></figure></li></ol><h4 id="缓存测试"><a href="#缓存测试" class="headerlink" title="缓存测试"></a>缓存测试</h4><ol><li>复制MybatisUtils工具类，db.properties和mybatis-config.xml到这个module中对应的位置，并对mybatis-config.xml<br>进行修改</li><li>创建一个User的pojo类<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@Data</span><br><span class="line">@AllArgsConstructor</span><br><span class="line">@NoArgsConstructor</span><br><span class="line">public class User implements Serializable &#123;</span><br><span class="line">    private int id;</span><br><span class="line">    private String name;</span><br><span class="line">    private String password;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li>在dao目录下创建对应的UserMapper和UserMapper.xml<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public interface UserMapper &#123;</span><br><span class="line"></span><br><span class="line">    User getUserById(int id);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;select id=&quot;getUserById&quot; parameterType=&quot;_int&quot; resultType=&quot;User&quot;&gt;</span><br><span class="line">    select * from `user` where id = #&#123;id&#125;;</span><br><span class="line">&lt;/select&gt;</span><br></pre></td></tr></table></figure></li><li>创建测试类<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">    public void test04()&#123;</span><br><span class="line">        SqlSession sqlSession = MybatisUtils.getSqlSession();</span><br><span class="line">        UserMapper mapper = sqlSession.getMapper(UserMapper.class);</span><br><span class="line">        //查询后会将数据放到一级缓存中</span><br><span class="line">        User user1 = mapper.getUserById(2);</span><br><span class="line">        System.out.println(user1);</span><br><span class="line">        System.out.println(&quot;===================================&quot;);</span><br><span class="line">        //再次查询就从一级缓存中获取，不走数据库了</span><br><span class="line">        User user2 = mapper.getUserById(2);</span><br><span class="line">        System.out.println(user2);</span><br><span class="line">        System.out.println(&quot;====================================&quot;);</span><br><span class="line">        //当会话session提交后，会将一级缓存的数据放到二级缓存中，并清空一级缓存</span><br><span class="line">        sqlSession.close();</span><br><span class="line">        //在同一个namespace中再次获取一个sqlSession</span><br><span class="line">        SqlSession sqlSession1 = MybatisUtils.getSqlSession();</span><br><span class="line">        UserMapper mapper1 = sqlSession1.getMapper(UserMapper.class);</span><br><span class="line">        //获取的数据会从二级缓存中找到，并直接返回</span><br><span class="line">        User user3 = mapper1.getUserById(2);</span><br><span class="line">        System.out.println(user3);</span><br><span class="line">        System.out.println(&quot;=====================================&quot;);</span><br><span class="line">        //要获取的数据从二级缓存中找不到，就会去这个sqlSession中的一个缓存中找数据，</span><br><span class="line">        //找不到后就到数据库中找</span><br><span class="line">        User user4 = mapper1.getUserById(3);</span><br><span class="line">        System.out.println(&quot;======================================&quot;);</span><br><span class="line">        //要获取的数据从二级缓存中找不到，就会去这个sqlSession中的一个缓存中找数据，</span><br><span class="line">        //在一级缓存中找到了数据，直接返回数据</span><br><span class="line">        User user5 = mapper1.getUserById(3);</span><br><span class="line">        System.out.println(user5);</span><br><span class="line">        sqlSession1.close();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li></ol></div><div><div><div style="text-align:center;color:#ccc;font-size:14px">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div></div></div><div><div style="padding:10px 0;margin:20px auto;width:90%;text-align:center"><div>如果这篇文章对你有帮助，可以来打赏一下哦~</div><button id="rewardButton" disable="enable" onclick='var qr=document.getElementById("QR");"none"===qr.style.display?qr.style.display="block":qr.style.display="none"'><span>打赏</span></button><div id="QR" style="display:none"><div id="wechat" style="display:inline-block"><img id="wechat_qr" src="/images/wechatpay.jpg" alt=" 微信支付"><p>微信支付</p></div><div id="alipay" style="display:inline-block"><img id="alipay_qr" src="/images/alipay.jpg" alt=" 支付宝"><p>支付宝</p></div></div></div></div><div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong> 言笑</li><li class="post-copyright-link"><strong>本文链接：</strong> <a href="https://yanxiaoblog.github.io/posts/4d69af73/" title="mybatis缓存">https://yanxiaoblog.github.io/posts/4d69af73/</a></li><li class="post-copyright-license"><strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！</li></ul></div><div></div><footer class="post-footer"><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/posts/53d38511/" rel="next" title="mybatis动态SQL"><i class="fa fa-chevron-left"></i> mybatis动态SQL</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/posts/db9e5318/" rel="prev" title="ioc原理及spring快速上手">ioc原理及spring快速上手 <i class="fa fa-chevron-right"></i></a></div></div></footer></div></article><div class="post-spread"></div></div></div><div class="comments" id="comments"><div id="lv-container" data-id="city" data-uid="MTAyMC81NDgzOC8zMTMwNw=="></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><img class="site-author-image" itemprop="image" src="/images/headImg.jpg" alt=""><p class="site-author-name" itemprop="name"></p><p class="site-description motion-element" itemprop="description"></p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/%7C%7C%20archive"><span class="site-state-item-count">49</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"><a href="/categories/index.html"><span class="site-state-item-count">4</span> <span class="site-state-item-name">分类</span></a></div><div class="site-state-item site-state-tags"><a href="/tags/index.html"><span class="site-state-item-count">3</span> <span class="site-state-item-name">标签</span></a></div></nav><div class="feed-link motion-element"><a href="/atom.xml" rel="alternate"><i class="fa fa-rss"></i> RSS</a></div><div class="links-of-author motion-element"><span class="links-of-author-item"><a href="https://github.com/1815972815" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a> </span><span class="links-of-author-item"><a href="https://gitee.com/yanxiaoStudy" target="_blank" title="Gitee"><i class="fa fa-fw fa-guilded"></i>Gitee</a> </span><span class="links-of-author-item"><a href="https://blog.csdn.net/qq_59630563?spm=1000.2115.3001.5343" target="_blank" title="CSDN"><i class="fa fa-fw fa-CSDN"></i>CSDN</a></span><div class="links-of-blogroll motion-element links-of-blogroll-block"><div class="links-of-blogroll-title"><i class="fa fa-history fa-" aria-hidden="true"></i> 近期文章</div><ul class="links-of-blogroll-list"><li class="recent_posts_li"><a href="/posts/4a17b156/" title="Hello World" target="_blank">Hello World</a></li><li class="recent_posts_li"><a href="/posts/aab1e47f/" title="微信公众号测试步骤" target="_blank">微信公众号测试步骤</a></li><li class="recent_posts_li"><a href="/posts/297fb2ac/" title="二叉树遍历完整代码" target="_blank">二叉树遍历完整代码</a></li><li class="recent_posts_li"><a href="/posts/f30c2ae3/" title="数据结构-树" target="_blank">数据结构-树</a></li><li class="recent_posts_li"><a href="/posts/e4ca25fd/" title="第二讲-线性结构-习题" target="_blank">第二讲-线性结构-习题</a></li></ul></div></div><div class="links-of-blogroll motion-element links-of-blogroll-inline"><div class="links-of-blogroll-title"><i class="fa fa-fw fa-globe"></i></div><ul class="links-of-blogroll-list"><li class="links-of-blogroll-item"><a href="https://www.bilibili.com/" title="b站" target="_blank">b站</a></li></ul></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#mybatis%E7%BC%93%E5%AD%98%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%B8%8E%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">mybatis缓存的实现与原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.0.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mybatis%E4%B8%AD%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">1.0.2.</span> <span class="nav-text">mybatis中的缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E7%BA%A7%E7%BC%93%E5%AD%98"><span class="nav-number">1.0.3.</span> <span class="nav-text">一级缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7%E7%BC%93%E5%AD%98"><span class="nav-number">1.0.4.</span> <span class="nav-text">二级缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%9A%84%E6%89%A7%E8%A1%8C%E5%8E%9F%E7%90%86%E5%9B%BE"><span class="nav-number">1.0.5.</span> <span class="nav-text">缓存的执行原理图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%AC%AC%E4%B8%89%E6%96%B9%E7%BC%93%E5%AD%98%E2%80%94%E2%80%94ehcache"><span class="nav-number">1.0.6.</span> <span class="nav-text">使用第三方缓存——ehcache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%B5%8B%E8%AF%95"><span class="nav-number">1.0.7.</span> <span class="nav-text">缓存测试</span></a></li></ol></li></ol></div></div></section><div id="music163player"><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=64634&auto=1&height=66"></iframe></div></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2022</span> <span class="with-love"><i class="fa fa-user"></i> </span><span class="author" itemprop="copyrightHolder">言笑</span> <span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-area-chart"></i> </span><span class="post-meta-item-text">Site words total count&#58;</span> <span title="Site words total count">112.9k</span></div><div class="busuanzi-count"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span class="site-uv">本站访问次数 <i class="fa fa-user"></i> <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 人次 </span><span class="site-pv">本站总访问量 <i class="fa fa-eye"></i> <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次</span></div></div></footer><div class="back-to-top"><i class="fa fa-arrow-up"></i> <span id="scrollpercent"><span>0</span>%</span></div></div><script type="text/javascript">"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script><script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script><script type="text/javascript" src="/lib/three/three.min.js"></script><script type="text/javascript" src="/lib/three/three-waves.min.js"></script><script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script><script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script><script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script><script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script><script type="text/javascript" src="/js/src/affix.js?v=5.1.3"></script><script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.3"></script><script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script><script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script><script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script><script type="text/javascript">!function(e,t){var n,c=e.getElementsByTagName(t)[0];"function"!=typeof LivereTower&&((n=e.createElement(t)).src="https://cdn-city.livere.com/js/embed.dist.js",n.async=!0,c.parentNode.insertBefore(n,c))}(document,"script")</script><script type="text/javascript">// Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });</script><script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script><script>AV.initialize("2TAuYAVzuOP0DA80NxrHNl7U-gzGzoHsz","N4O608z2xXbCBD77HyG60ket")</script><script>function showTime(e){var t=new AV.Query(e),c=[],u=$(".leancloud_visitors");u.each(function(){c.push($(this).attr("id").trim())}),t.containedIn("url",c),t.find().done(function(e){var t=".leancloud-visitors-count";if(0!==e.length){for(var n=0;n<e.length;n++){var o=e[n],i=o.get("url"),s=o.get("time"),r=document.getElementById(i);$(r).find(t).text(s)}for(n=0;n<c.length;n++){var i=c[n],r=document.getElementById(i),l=$(r).find(t);""==l.text()&&l.text(0)}}else u.find(t).text(0)}).fail(function(e,t){console.log("Error: "+t.code+" "+t.message)})}function addCount(i){var e=$(".leancloud_visitors"),s=e.attr("id").trim(),r=e.attr("data-flag-title").trim(),t=new AV.Query(i);t.equalTo("url",s),t.find({success:function(e){var t,n,o;0<e.length?((t=e[0]).fetchWhenSave(!0),t.increment("time"),t.save(null,{success:function(e){$(document.getElementById(s)).find(".leancloud-visitors-count").text(e.get("time"))},error:function(e,t){console.log("Failed to save Visitor num, with error message: "+t.message)}})):(n=new i,(o=new AV.ACL).setPublicReadAccess(!0),o.setPublicWriteAccess(!0),n.setACL(o),n.set("title",r),n.set("url",s),n.set("time",1),n.save(null,{success:function(e){$(document.getElementById(s)).find(".leancloud-visitors-count").text(e.get("time"))},error:function(e,t){console.log("Failed to create")}}))},error:function(e){console.log("Error:"+e.code+" "+e.message)}})}$(function(){var e=AV.Object.extend("Counter");1==$(".leancloud_visitors").length?addCount(e):1<$(".post-title-link").length&&showTime(e)})</script><style>.copy-btn{display:inline-block;padding:6px 12px;font-size:13px;font-weight:700;line-height:20px;color:#333;white-space:nowrap;vertical-align:middle;cursor:pointer;background-color:#eee;background-image:linear-gradient(#fcfcfc,#eee);border:1px solid #d5d5d5;border-radius:3px;user-select:none;outline:0}.highlight-wrap .copy-btn{transition:opacity .3s ease-in-out;opacity:0;padding:2px 6px;position:absolute;right:4px;top:8px}.highlight-wrap .copy-btn:focus,.highlight-wrap:hover .copy-btn{opacity:1}.highlight-wrap{position:relative}</style><script>$(".highlight").each(function(t,e){var n=$("<div>").addClass("highlight-wrap");$(e).after(n),n.append($("<button>").addClass("copy-btn").append("复制").on("click",function(t){var e=$(this).parent().find(".code").find(".line").map(function(t,e){return $(e).text()}).toArray().join("\n"),n=document.createElement("textarea");document.body.appendChild(n),n.style.position="absolute",n.style.top="0px",n.style.left="0px",n.value=e,n.select(),n.focus();var o=document.execCommand("copy");document.body.removeChild(n),o?$(this).text("复制成功"):$(this).text("复制失败"),$(this).blur()})).on("mouseleave",function(t){var e=$(this).find(".copy-btn");setTimeout(function(){e.text("复制")},300)}).append(e)})</script></body></html>
