@@ -1,6 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>小程序制作流程</title>
+    <url>/posts/2aa2ccb8/</url>
+    <content><![CDATA[<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>本文描述的是小程序制作的整个流程，以及在小程序制作时遇到的问题的注意事项。 </p>
+<span id="more"></span>
+<h3 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h3><p>小程序的开发主要分为四步，首先注册一个开发账号，然后在注册的时候进行信息的完善，再然后就可以下载开发工具后进行开发了，最后就是开发完成的小程序进行提交审核和发布，小程序的开发的整个流程图下图所示：<br><img src="/posts/2aa2ccb8/%E6%B5%81%E7%A8%8B.png">  </p>
+<h3 id="注册"><a href="#注册" class="headerlink" title="注册"></a>注册</h3><ol>
+<li><p>进入到 <a href="https://mp.weixin.qq.com/">https://mp.weixin.qq.com/</a> 页面，点击右上角的立即注册，如图所示：<br><img src="/posts/2aa2ccb8/%E6%B3%A8%E5%86%8C.png"></p>
+</li>
+<li><p>选择注册类型，选择“小程序”，点击“查看类型区别”可查看不同类型帐号的区别和优势，如图所示：<br><img src="/posts/2aa2ccb8/%E6%B3%A8%E5%86%8C%E7%B1%BB%E5%9E%8B.png"></p>
+</li>
+<li><p>进行注册，邮箱激活和信息的完善，根据页面的提示进行操作即可，如图所示：<br><img src="/posts/2aa2ccb8/%E8%BF%9B%E8%A1%8C%E6%B3%A8%E5%86%8C.png">  </p>
+</li>
+</ol>
+<p>注意：在进行信息登记的时候，选择主题类型处一般选择个人，选择企业的话要收费<br>好啦，到这里小程序开发账号注册完成啦，可以到刚才的注册的步骤一的页面去登录啦！  </p>
+<h3 id="小程序信息完善"><a href="#小程序信息完善" class="headerlink" title="小程序信息完善"></a>小程序信息完善</h3><ol>
+<li><p>登录后进入到首页，如图所示：<br><img src="/posts/2aa2ccb8/%E7%99%BB%E5%BD%95%E5%90%8E.png"></p>
+</li>
+<li><p>点击小程序信息的填写按钮进行信息完善，如图所示：<br><img src="/posts/2aa2ccb8/%E4%BF%A1%E6%81%AF%E5%AE%8C%E5%96%84.png">  </p>
+</li>
+</ol>
+<h3 id="小程序的开发"><a href="#小程序的开发" class="headerlink" title="小程序的开发"></a>小程序的开发</h3><ol>
+<li>下载小程序开发者工具<br>地址：<a href="https://developers.weixin.qq.com/miniprogram/dev/devtools/stable.html">https://developers.weixin.qq.com/miniprogram/dev/devtools/stable.html</a><br>具体如图所示：<br><img src="/posts/2aa2ccb8/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7.png">  </li>
+</ol>
+<p>下载完成后进行安装，直接不听下一步就行，如果想要改变安装地址，直接改变即可。<br>2. 双击小程序进行登录，如图所示：<br><img src="/posts/2aa2ccb8/%E7%99%BB%E5%BD%95.png">  </p>
+<ol start="3">
+<li><p>选择小程序，点击加好创建小程序项目，如图所示：<br><img src="/posts/2aa2ccb8/%E5%88%9B%E5%BB%BA%E6%96%B0%E9%A1%B9%E7%9B%AE.png">  </p>
+</li>
+<li><p>填写项目基本信息，如图所示：<br><img src="/posts/2aa2ccb8/%E5%88%9B%E5%BB%BA.png">  </p>
+</li>
+</ol>
+<p>appID获取如图所示：<br><img src="/posts/2aa2ccb8/appID.png">  </p>
+<p>注意还有个模板选择，如图所示：<br><img src="/posts/2aa2ccb8/%E6%A8%A1%E6%9D%BF%E9%80%89%E6%8B%A9.png">  </p>
+<ol start="5">
+<li><p>到这里小程序的项目就创建成功啦，我们可以进行开发啦，创建成功界面如图所示：<br><img src="/posts/2aa2ccb8/%E5%88%9B%E5%BB%BA%E6%88%90%E5%8A%9F.png">  </p>
+</li>
+<li><p>目录结构介绍<br><img src="/posts/2aa2ccb8/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">  </p>
+</li>
+<li><p>文件的创建，如图所示：<br><img src="/posts/2aa2ccb8/appjs%E6%96%87%E4%BB%B6.png">  </p>
+</li>
+</ol>
+<p>当然你也可以手动进行创建。<br>8. center.js简介  </p>
+<ul>
+<li><p>data{}：<br><img src="/posts/2aa2ccb8/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8.png">  </p>
+</li>
+<li><p>三个方法的调用顺序 onload–&gt;onShow–&gt;onReady<br><img src="/posts/2aa2ccb8/%E8%B0%83%E7%94%A8%E9%A1%BA%E5%BA%8F.png">  </p>
+</li>
+</ul>
+<ol start="9">
+<li><p>app.js简介<br><img src="/posts/2aa2ccb8/appjs%E4%BB%8B%E7%BB%8D.png">  </p>
+</li>
+<li><p>域名校验<br><img src="/posts/2aa2ccb8/%E5%9F%9F%E5%90%8D%E6%A0%A1%E9%AA%8C.png">  </p>
+</li>
+</ol>
+<p>好啦，小程序开发就介绍到这里啦，想要了解更多，可以参考官方文档。<br>官方文档地址：<a href="https://developers.weixin.qq.com/miniprogram/dev/framework/">https://developers.weixin.qq.com/miniprogram/dev/framework/</a>  </p>
+<h3 id="审核和发布"><a href="#审核和发布" class="headerlink" title="审核和发布"></a>审核和发布</h3><ol>
+<li><p>点击上传，如图所示<br><img src="/posts/2aa2ccb8/%E4%B8%8A%E4%BC%A0.png">  </p>
+</li>
+<li><p>具体的审核和发布可参考：<a href="https://zhuanlan.zhihu.com/p/39936955">https://zhuanlan.zhihu.com/p/39936955</a>  </p>
+</li>
+</ol>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ol>
+<li><p>添加开发成员和体验成员在成员管理中进行添加<br><img src="/posts/2aa2ccb8/%E6%88%90%E5%91%98%E7%AE%A1%E7%90%86.png">  </p>
+</li>
+<li><p>体验版本扫码后页面不能跳转，一般是因为请求地址不规范，要用https才是规范的（不能发起请求然后不能进行页面跳转，可以尝试下面的方法） </p>
+</li>
+</ol>
+<ul>
+<li><p>解决方法一：进行ip白名单的配置  </p>
+<ul>
+<li><p>登录微信小程序的后台，点击开发管理–&gt;开发设置，如图所示：<br><img src="/posts/2aa2ccb8/%E5%BC%80%E5%8F%91%E8%AE%BE%E7%BD%AE.png">  </p>
+</li>
+<li><p>找到ip白名单或者服务器域名进行配置，如图所示：<br><img src="/posts/2aa2ccb8/%E5%9C%B0%E5%9D%80%E7%99%BD%E5%90%8D%E5%8D%95.png">  </p>
+</li>
+</ul>
+<p>  如果方法一不成功，可以尝试第二种方法</p>
+</li>
+<li><p>解决方法二：打开手机调试模式后就能够进行跳转了  </p>
+<ul>
+<li><p>找到打开调试的地方<br><img src="/posts/2aa2ccb8/%E8%B0%83%E8%AF%951.png">  </p>
+</li>
+<li><p>打开调试(此处我已经打开)<br><img src="/posts/2aa2ccb8/%E8%B0%83%E8%AF%952.png">  </p>
+</li>
+<li><p>打开调试成功<br><img src="/posts/2aa2ccb8/%E8%B0%83%E8%AF%953.png">  </p>
+</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>使用微信小程序进行版本管理时推送失败<br><img src="/posts/2aa2ccb8/%E6%8E%A8%E9%80%81%E5%A4%B1%E8%B4%A5.png">  </li>
+</ol>
+<p>解决方法：<br><img src="/posts/2aa2ccb8/%E6%8E%A8%E9%80%81%E5%A4%B1%E8%B4%A5%E8%A7%A3%E5%86%B3.png">  </p>
+<ol start="4">
+<li><p>版本管理时没有项目<br><img src="/posts/2aa2ccb8/%E4%BB%A3%E7%A0%81%E7%AE%A1%E7%90%86.png"><br><img src="/posts/2aa2ccb8/%E5%88%9B%E5%BB%BA%E9%A1%B9%E7%9B%AE.png">  </p>
+</li>
+<li><p>项目拉取不下来<br><img src="/posts/2aa2ccb8/%E9%A1%B9%E7%9B%AE%E6%8B%89%E5%8F%96.png">  </p>
+</li>
+</ol>
+<p>选择从git导入<br><img src="/posts/2aa2ccb8/git%E5%AF%BC%E5%85%A5.png">  </p>
+<ol start="6">
+<li><p>微信git账号的创建<br>地址：<a href="https://git.weixin.qq.com/">https://git.weixin.qq.com/</a>  </p>
+</li>
+<li><p>真机调试控制台报错，可以切换成真机调试1.0版本进行<br><img src="/posts/2aa2ccb8/%E7%9C%9F%E6%9C%BA%E8%B0%83%E8%AF%95.png">  </p>
+</li>
+</ol>
+<h3 id="常用代码参考"><a href="#常用代码参考" class="headerlink" title="常用代码参考"></a>常用代码参考</h3><ol>
+<li>请求方法<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">wx.request(&#123;</span><br><span class="line">    <span class="attr">url</span>: ,</span><br><span class="line">    data: &#123;<span class="comment">//url参数</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">method</span>: <span class="string">&#x27;GET&#x27;</span>, </span><br><span class="line">    success (res1) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></li>
+<li>页面跳转方法  <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 保留当前页面，跳转到应用的某个页面，点击返回按钮时还可以返回原来页面,不能跳转到tabBar页面</span></span><br><span class="line">wx.navigateTo(&#123;</span><br><span class="line">    <span class="attr">url</span>: <span class="string">&#x27;文件地址&#x27;</span>,    地址后面也可以追加参数  <span class="string">&#x27;page/index/index?id=123&amp;page=2&#x27;</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 关闭当前页面，跳转到应用内的某个页面。  点击返回按钮时不会返回原来页面</span></span><br><span class="line">wx.redirectTo(&#123;</span><br><span class="line">    <span class="attr">url</span>: <span class="string">&#x27;page/index/index?id=123&amp;page=2&#x27;</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 关闭所有页面，打开到应用内的某个页面。</span></span><br><span class="line">wx.reLanch(&#123;</span><br><span class="line">  <span class="attr">url</span>: <span class="string">&#x27;page/index/index?id=123&amp;page=2&#x27;</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面</span></span><br><span class="line"><span class="comment">// 注意：必须是在app.json中注册过的tabBar 页面</span></span><br><span class="line">wx.switchTab(&#123;</span><br><span class="line">    <span class="attr">url</span>: <span class="string">&#x27;page/index/index&#x27;</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></li>
+<li>弹窗<br>地址：<a href="https://blog.csdn.net/qq_43248623/article/details/106421617">https://blog.csdn.net/qq_43248623/article/details/106421617</a>  </li>
+</ol>
+<p>本文到此结束啦！</p>
+<hr>
+]]></content>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/posts/4a17b156/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -49,6 +163,20 @@
 </ul>
 <p><img src="/posts/aab1e47f/10.png">  </p>
 <p><img src="/posts/aab1e47f/11.png">  </p>
+<ul>
+<li>结合微信公众号的绑定测试步骤，我们再来看一下微信公众号域名绑定的步骤吧！步骤和测试的步骤差不多：  </li>
+</ul>
+<ol>
+<li><p>搜索微信公众平台进行登录<br><img src="/posts/aab1e47f/%E7%99%BB%E5%BD%95.png"></p>
+</li>
+<li><p>在js接口安全域名和网页授权域名处添加上要绑定的域名<br><img src="/posts/aab1e47f/%E5%9F%9F%E5%90%8D%E6%B7%BB%E5%8A%A0.png"></p>
+</li>
+<li><p>在基本配置中进行基本的配置<br><img src="/posts/aab1e47f/%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE.png"></p>
+</li>
+<li><p>在配置文件中进行appID、Secret和host的配置<br><img src="/posts/aab1e47f/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E9%85%8D%E7%BD%AE.png">  </p>
+</li>
+</ol>
+<p>配置完成!  </p>
 <hr>
 <p>公众号测试步骤到此结束，如果觉得有帮助，可以打赏一波哦！</p>
 ]]></content>
